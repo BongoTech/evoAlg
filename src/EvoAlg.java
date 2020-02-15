@@ -19,6 +19,7 @@ import java.util.Random;
 public class EvoAlg {
     public static void main(String [] args) {
         //Change this to alter the number of individuals.
+        //Only works for even numbers.
         int pop_size = 30;
         //Change this to alter the number of genes in each individual.
         int genome_size = 3;

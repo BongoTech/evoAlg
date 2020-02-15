@@ -27,6 +27,16 @@ public class Population {
     //Using the same seed results in the exact same initial population.
     private long pop_seed;
 
+    //Use this Constructor to make a blank population.
+    Population(int pop_size) {
+        this.pop_size = pop_size;
+        population = new Individual[this.pop_size];
+        pop_cumulative_probs = new double[this.pop_size];
+
+        pop_seed = 0;
+    }
+
+
     //Constructor. Takes in the population size, Genome size, the bounds for the allowable gene values,
     //and the seed used for 'random' generation of the population.
     Population(int pop_size, int genome_size, double gene_lower_bound, double gene_upper_bound, long pop_seed) {
@@ -42,6 +52,15 @@ public class Population {
         //Call this init function to 'randomly' generate values
         //for each gene and each individual within the population.
         init(genome_size, gene_lower_bound, gene_upper_bound);
+    }
+
+    //***GETTERS AND SETTERS***//
+    public  void setIndividual(Individual individual, int i) {
+        if (i >= pop_size || i < 0) {
+            System.out.println("Invalid Population index in 'setIndividual' from caller");
+            System.exit(-1);
+        }
+        population[i] = individual;
     }
 
     public Individual getIndividual(int i) {
