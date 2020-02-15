@@ -79,6 +79,14 @@ public class Population {
         pop_cumulative_probs[i] = prob;
     }
 
+    public double getPop_cumulative_probs(int i) {
+        if (i >= pop_size || i < 0) {
+            System.out.println("Invalid cumulative_prob index from caller.");
+            System.exit(-1);
+        }
+        return pop_cumulative_probs[i];
+    }
+
     public int getPop_size() {
         return pop_size;
     }

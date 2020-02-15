@@ -39,6 +39,15 @@ public class EvoAlg {
         //Sample the initial population
         sample(pop);
 
+        //Select an Individual from initial pop.
+        Individual individual = select(pop, r);
+        System.out.println("SELECTED INDIVIDUAL!");
+        individual.print();
+
+        individual = select(pop, r);
+        System.out.println("SELECTED INDIVIDUAL!");
+        individual.print();
+
         //Printing to test population generation and reproducibility of results.
         pop.print();
     }
@@ -100,5 +109,18 @@ public class EvoAlg {
         //it can be measured by caller to track
         //Population fitness over generations.
         return F;
+    }
+
+    private static Individual select(Population population, Random random) {
+        double r = random.nextDouble();
+        for (int i = 0; i < population.getPop_size(); i++) {
+            double prob_select = population.getPop_cumulative_probs(i);
+            if (r < prob_select) {
+                return population.getIndividual(i);
+            }
+        }
+        System.out.println("Failed to select an Individual.");
+        System.exit(-1);
+        return new Individual(3);
     }
 }
