@@ -44,6 +44,18 @@ public class Population {
         init(genome_size, gene_lower_bound, gene_upper_bound);
     }
 
+    public Individual getIndividual(int i) {
+        if (i >= pop_size || i < 0) {
+            System.out.println("Invalid Population index from caller.");
+            System.exit(-1);
+        }
+        return population[i];
+    }
+
+    public int getPop_size() {
+        return pop_size;
+    }
+
     //init takes the gene size and the allowable gene value bounds. It then 'randomly'
     //selects allowable values for each gene in each individual to serve as the initial
     //population.

@@ -10,6 +10,8 @@
 //mutation rates, etc. With changes to specific functions different problems can be tackled.
 //This program is meant be a modular and easily configurable platform for evolutionary
 //algorithms.
+//Current Function: f(x,y,z) = x^2 + y^2 + z^2
+//Current Objective: Minimize
 //*************************************************************************************************
 
 import java.util.Random;
@@ -30,7 +32,36 @@ public class EvoAlg {
         //Create the initial population.
         Population pop = new Population(pop_size, genome_size, domain[0], domain[1], r.nextLong());
 
+        //Evaluate the initial population
+        eval(pop);
+
         //Printing to test population generation and reproducibility of results.
         pop.print();
+    }
+
+    //The eval function assigns a fitness value to each individual in the
+    //Population. This value is based off the function f(x,y,z)= x^2 + y^2 + z^2.
+    //In our case the Domain of the function is [-1,5] making the range [0,75].
+    //Because we are minimizing we would like to reward the smallest values.
+    //During sampling the highest fitness number is rewarded. To fix this
+    //contradiction we remap small values to high ones and vice versa
+    //by subtracting the calculated function value from the ranges max
+    //value. Small function values result in very little being subtracted
+    //from the max range, 75, which means that the fitness value is very
+    //high for small function values.
+    //Ex:
+    //  function value = 0.05 (This is a good value we would like to reward)
+    //  fitness value = 75 - 0.05 = 74.95 (This is a very high value that will
+    //                                      be rewarded in sampling)
+    private static void eval(Population population) {
+        for (int i = 0; i < population.getPop_size(); i++) {
+            Individual individual = population.getIndividual(i);
+            double x_sq = Math.pow(individual.getGene(0), 2);
+            double y_sq = Math.pow(individual.getGene(1), 2);
+            double z_sq = Math.pow(individual.getGene(2), 2);
+            double function_value = x_sq + y_sq + z_sq;
+            double fitness_value = 75 - function_value;
+            individual.setFitness(fitness_value);
+        }
     }
 }

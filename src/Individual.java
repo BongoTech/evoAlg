@@ -79,6 +79,10 @@ public class Individual {
         this.prob_selection = prob_selection;
     }
 
+    public int getGenome_size() {
+        return genome_size;
+    }
+
     //This method prints out all information associated
     //with an individual.
     public void print() {
