@@ -22,10 +22,10 @@ public class Population {
     //for the next population.
     private double [] pop_cumulative_probs;
     //The number of Individuals in the population.
-    int pop_size;
+    private int pop_size;
     //This seed is used for the reproduction of results,
     //Using the same seed results in the exact same initial population.
-    long pop_seed;
+    private long pop_seed;
 
     //Constructor. Takes in the population size, Genome size, the bounds for the allowable gene values,
     //and the seed used for 'random' generation of the population.
@@ -52,6 +52,14 @@ public class Population {
         return population[i];
     }
 
+    public void setPop_cumulative_probs(double prob, int i) {
+        if (i >= pop_size || i < 0) {
+            System.out.println("Invalid cumulative_prob index from caller.");
+            System.exit(-1);
+        }
+        pop_cumulative_probs[i] = prob;
+    }
+
     public int getPop_size() {
         return pop_size;
     }
@@ -75,6 +83,10 @@ public class Population {
         for (int i = 0; i < pop_size; i++) {
             System.out.println("\nPopulation member: " + i);
             population[i].print();
+        }
+        System.out.println("\n\nCumulative Probs:");
+        for (int i = 0; i < pop_size; i++) {
+            System.out.println(pop_cumulative_probs[i]);
         }
     }
 }

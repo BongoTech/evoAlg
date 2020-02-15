@@ -35,6 +35,9 @@ public class EvoAlg {
         //Evaluate the initial population
         eval(pop);
 
+        //Sample the initial population
+        sample(pop);
+
         //Printing to test population generation and reproducibility of results.
         pop.print();
     }
@@ -63,5 +66,38 @@ public class EvoAlg {
             double fitness_value = 75 - function_value;
             individual.setFitness(fitness_value);
         }
+    }
+
+    //The sample method generates the statistics for correct
+    //population selection.
+    private static double sample(Population population) {
+        //Total population fitness
+        double F = 0;
+        //Rolling prob accumulates the probabilities
+        //for insertion into pop_cumulative_prob in
+        //the Population class.
+        double rolling_prob = 0;
+        //Calculate the total population fitness.
+        for (int i = 0; i < population.getPop_size(); i++) {
+            F = F + population.getIndividual(i).getFitness();
+        }
+        System.out.println("\nPop Fit: " + F + "\n");
+        //Calculate each individuals probability of selection.
+        for (int i = 0; i < population.getPop_size(); i++) {
+            Individual individual = population.getIndividual(i);
+            double prob_selection = individual.getFitness() / F;
+            individual.setProb_selection(prob_selection);
+        }
+        //Calculate the cumulative probability table directly
+        //used for selecting individuals.
+        for (int i = 0; i < population.getPop_size(); i++) {
+            rolling_prob = rolling_prob + population.getIndividual(i).getProb_selection();
+            population.setPop_cumulative_probs(rolling_prob, i);
+        }
+
+        //Return the total population fitness so
+        //it can be measured by caller to track
+        //Population fitness over generations.
+        return F;
     }
 }
