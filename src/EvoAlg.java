@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class EvoAlg {
     public static void main(String [] args) {
+        //*******PARAMETERS*******//
         //Change this to alter the number of individuals.
         //Only works for even numbers.
         int pop_size = 30;
@@ -32,29 +33,54 @@ public class EvoAlg {
         double p_c = 0.8;
         //Change this to alter mutation rate
         double p_m = 0.1;
-
+        //The number of generations
+        int generations = 50;
+        //The Random used by the entire program.
         Random r = new Random(seed);
 
+        //***MAIN EVOLUTIONARY ALGORITHM******************************************************************
+        int t = 0;
         //Create the initial population.
         Population pop = new Population(pop_size, genome_size, domain[0], domain[1], r.nextLong());
-
         //Evaluate the initial population
         eval(pop);
-
         //Sample the initial population
         sample(pop);
-
-        //Testing the mutation and crossover and selection methods.
-        Individual [] individuals;
-        individuals = mutate(crossover(select(pop, r), select(pop, r), r, p_c), r, p_m, domain[0], domain[1]);
-        System.out.println("ID AFTER CROSSOVER AND MUTATION!");
-        for (int i = 0; i < 2; i++ ) {
-            individuals[i].print();
+        //While we still have generations to complete.
+        while (t < generations) {
+            //Create a new population to temporarily store selected individuals.
+            Population pop_plus_one = new Population(pop_size);
+            //Fill up this new population. Two individuals are selected at a time
+            //and undergo crossover and mutation. These two individuals are placed
+            //in the first half and second half of the new population.
+            //Therefore only need to iterate half the size of the population.
+            for (int i = 0; i < pop_size/2; i++) {
+                //Create an array of individuals to store results of selection, crossover, and mutation.
+                Individual [] individuals;
+                individuals = mutate(crossover(select(pop, r), select(pop, r), r, p_c), r, p_m, domain[0], domain[1]);
+                //Add the first individual to the first half of the population.
+                pop_plus_one.setIndividual(individuals[0], i);
+                //Add the second individual to the second half of the population.
+                pop_plus_one.setIndividual(individuals[1], 15+i);
+            }
+            //The new population is complete, assign it as the previous generation
+            //to move to the new gen.
+            pop = pop_plus_one;
+            //Evaluate the new generation.
+            eval(pop);
+            //Sample the new generation.
+            //F is total pop fitness.
+            double F = sample(pop);
+            //At intervals of 10, print the total gen fitness.
+            if (t % 10 == 0) {
+                System.out.println("Total fitness for gen " + t + ": " + F);
+            }
+            //Increment the generation number.
+            t += 1;
         }
-        System.out.println();
-
-        //Printing to test population generation and reproducibility of results.
+        //When everything is done print the resulting solution.
         pop.print();
+
     }
 
     //The eval function assigns a fitness value to each individual in the
@@ -96,7 +122,7 @@ public class EvoAlg {
         for (int i = 0; i < population.getPop_size(); i++) {
             F = F + population.getIndividual(i).getFitness();
         }
-        System.out.println("\nPop Fit: " + F + "\n");
+        System.out.println("Pop Fit: " + F + "");
         //Calculate each individuals probability of selection.
         for (int i = 0; i < population.getPop_size(); i++) {
             Individual individual = population.getIndividual(i);
@@ -109,6 +135,9 @@ public class EvoAlg {
             rolling_prob = rolling_prob + population.getIndividual(i).getProb_selection();
             population.setPop_cumulative_probs(rolling_prob, i);
         }
+        //Ensure the last entry is always 1.0, that way something will
+        //always be selected.
+        population.setPop_cumulative_probs(1.0, population.getPop_size()-1);
 
         //Return the total population fitness so
         //it can be measured by caller to track

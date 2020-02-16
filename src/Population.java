@@ -111,9 +111,9 @@ public class Population {
             System.out.println("\nPopulation member: " + i);
             population[i].print();
         }
-        System.out.println("\n\nCumulative Probs:");
+        /*System.out.println("\n\nCumulative Probs:");
         for (int i = 0; i < pop_size; i++) {
             System.out.println(pop_cumulative_probs[i]);
-        }
+        }*/
     }
 }
