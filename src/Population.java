@@ -36,6 +36,18 @@ public class Population {
         pop_seed = 0;
     }
 
+    //Constructor for copying Population object
+    Population(Population population) {
+        pop_size = population.getPop_size();
+        this.population = new Individual[pop_size];
+        pop_cumulative_probs = new double[pop_size];
+        pop_seed = population.getPop_seed();
+
+        for (int i = 0; i < pop_size; i++) {
+            this.population[i] = new Individual(population.getIndividual(i));
+            pop_cumulative_probs[i] = population.getPop_cumulative_probs(i);
+        }
+    }
 
     //Constructor. Takes in the population size, Genome size, the bounds for the allowable gene values,
     //and the seed used for 'random' generation of the population.
@@ -52,6 +64,20 @@ public class Population {
         //Call this init function to 'randomly' generate values
         //for each gene and each individual within the population.
         init(genome_size, gene_lower_bound, gene_upper_bound);
+    }
+
+    //init takes the gene size and the allowable gene value bounds. It then 'randomly'
+    //selects allowable values for each gene in each individual to serve as the initial
+    //population.
+    private void init(int genome_size, double gene_lower_bound, double gene_upper_bound) {
+        Random r = new Random(pop_seed);
+        for (int i = 0; i < pop_size; i++) {
+            for (int j = 0; j < genome_size; j++) {
+                //Generate double within the bounds.
+                double gene_value = gene_lower_bound + (gene_upper_bound - gene_lower_bound) * r.nextDouble();
+                population[i].setGene(gene_value, j);
+            }
+        }
     }
 
     //***GETTERS AND SETTERS***//
@@ -91,18 +117,8 @@ public class Population {
         return pop_size;
     }
 
-    //init takes the gene size and the allowable gene value bounds. It then 'randomly'
-    //selects allowable values for each gene in each individual to serve as the initial
-    //population.
-    private void init(int genome_size, double gene_lower_bound, double gene_upper_bound) {
-        Random r = new Random(pop_seed);
-        for (int i = 0; i < pop_size; i++) {
-            for (int j = 0; j < genome_size; j++) {
-                //Generate double within the bounds.
-                double gene_value = gene_lower_bound + (gene_upper_bound - gene_lower_bound) * r.nextDouble();
-                population[i].setGene(gene_value, j);
-            }
-        }
+    public long getPop_seed() {
+        return pop_seed;
     }
 
     //This method prints out an entire population of individuals.

@@ -23,6 +23,7 @@ public class EvoAlg {
         //Only works for even numbers.
         int pop_size = 30;
         //Change this to alter the number of genes in each individual.
+        //Changing this without altering other code is dangerous.
         int genome_size = 3;
         //Select the domain here.
         double [] domain = {-1, 5};
@@ -49,23 +50,27 @@ public class EvoAlg {
         //While we still have generations to complete.
         while (t < generations) {
             //Create a new population to temporarily store selected individuals.
-            Population pop_plus_one = new Population(pop_size);
+            Population next_pop = new Population(pop_size);
             //Fill up this new population. Two individuals are selected at a time
             //and undergo crossover and mutation. These two individuals are placed
             //in the first half and second half of the new population.
             //Therefore only need to iterate half the size of the population.
             for (int i = 0; i < pop_size/2; i++) {
+                //Create a copy of the current population to pass into the
+                //select, crossover and mutate methods because they corrupt the
+                //original population because Java is pass by reference.
+                Population pop_clone = new Population(pop);
                 //Create an array of individuals to store results of selection, crossover, and mutation.
                 Individual [] individuals;
-                individuals = mutate(crossover(select(pop, r), select(pop, r), r, p_c), r, p_m, domain[0], domain[1]);
+                individuals = mutate(crossover(select(pop_clone, r), select(pop_clone, r), r, p_c), r, p_m, domain[0], domain[1]);
                 //Add the first individual to the first half of the population.
-                pop_plus_one.setIndividual(individuals[0], i);
+                next_pop.setIndividual(individuals[0], i);
                 //Add the second individual to the second half of the population.
-                pop_plus_one.setIndividual(individuals[1], 15+i);
+                next_pop.setIndividual(individuals[1], (pop_size/2)+i);
             }
             //The new population is complete, assign it as the previous generation
             //to move to the new gen.
-            pop = pop_plus_one;
+            pop = next_pop;
             //Evaluate the new generation.
             eval(pop);
             //Sample the new generation.
@@ -122,7 +127,7 @@ public class EvoAlg {
         for (int i = 0; i < population.getPop_size(); i++) {
             F = F + population.getIndividual(i).getFitness();
         }
-        System.out.println("Pop Fit: " + F + "");
+        //System.out.println("Pop Fit: " + F + "");
         //Calculate each individuals probability of selection.
         for (int i = 0; i < population.getPop_size(); i++) {
             Individual individual = population.getIndividual(i);
@@ -149,6 +154,7 @@ public class EvoAlg {
     //of a new individual fro the population.
     private static Individual select(Population population, Random random) {
         double r = random.nextDouble();
+        //System.out.println("select rand: " + r);
         //Loop through the cumulative probability table and return
         //the first individual associated with the index of the table
         //that has a probability of selection greater than r.
@@ -172,6 +178,7 @@ public class EvoAlg {
     // i1: <1 2 3> i2: <4 5 6> --> i1: <4 2 3> i2: <1 5 6>
     private static Individual[] crossover(Individual i1, Individual i2, Random random, double p_c) {
         double r = random.nextDouble();
+        //System.out.println("Crossover rand: " + r);
         Individual [] individuals = new Individual[2];
         if (r < p_c) {
             //Crossover occurs
@@ -208,6 +215,7 @@ public class EvoAlg {
             //Loop through an individual's genes
             for (int j = 0; j < individuals[i].getGenome_size(); j++) {
                 r = random.nextDouble();
+                //System.out.println("mutation rand: " + r);
                 if (r < p_m) {
                     //Mutation occurs
                     double gene_value = gene_lower_bound + (gene_upper_bound - gene_lower_bound) * random.nextDouble();

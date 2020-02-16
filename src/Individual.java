@@ -38,6 +38,17 @@ public class Individual {
         prob_selection = 0;
     }
 
+    //Constructor for copying individuals
+    Individual(Individual individual) {
+        genome_size = individual.getGenome_size();
+        genome = new double[genome_size];
+        fitness = individual.getFitness();
+        prob_selection = individual.getProb_selection();
+        for (int i = 0; i < genome_size; i++) {
+            genome[i] = individual.getGene(i);
+        }
+    }
+
     //*****GETTERS AND SETTERS*****//
     public double[] getGenome() {
         return genome;
