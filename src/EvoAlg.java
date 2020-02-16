@@ -28,6 +28,9 @@ public class EvoAlg {
         //Change this seed each time you'd like to produce a different
         //run. Record this seed for reproducibility of results.
         long seed = 835149854;
+        //Change to alter the probability of crossover
+        double p_c = 0.8;
+
         Random r = new Random(seed);
 
         //Create the initial population.
@@ -39,14 +42,13 @@ public class EvoAlg {
         //Sample the initial population
         sample(pop);
 
-        //Select an Individual from initial pop.
-        Individual individual = select(pop, r);
-        System.out.println("SELECTED INDIVIDUAL!");
-        individual.print();
-
-        individual = select(pop, r);
-        System.out.println("SELECTED INDIVIDUAL!");
-        individual.print();
+        Individual [] individuals;
+        individuals = crossover(select(pop, r), select(pop, r), r, p_c);
+        System.out.println("ID AFTER CROSSOVER!");
+        for (int i = 0; i < 2; i++ ) {
+            individuals[i].print();
+        }
+        System.out.println();
 
         //Printing to test population generation and reproducibility of results.
         pop.print();
@@ -111,16 +113,54 @@ public class EvoAlg {
         return F;
     }
 
+    //select takes in the population and the random to make a selection
+    //of a new individual fro the population.
     private static Individual select(Population population, Random random) {
         double r = random.nextDouble();
+        //Loop through the cumulative probability table and return
+        //the first individual associated with the index of the table
+        //that has a probability of selection greater than r.
         for (int i = 0; i < population.getPop_size(); i++) {
             double prob_select = population.getPop_cumulative_probs(i);
             if (r < prob_select) {
                 return population.getIndividual(i);
             }
         }
+        //Don't return anything if nothing was selected.
+        //If we reach here something went wrong.
         System.out.println("Failed to select an Individual.");
         System.exit(-1);
         return new Individual(3);
+    }
+
+    //crossover takes in two individuals and using random and probability of crossover(p_c)
+    //randomly crosses the genes between each other. There can either be a head swap or a
+    //tail swap in the current configuration of 3 genes.
+    //ex headswap:
+    // i1: <1 2 3> i2: <4 5 6> --> i1: <4 2 3> i2: <1 5 6>
+    private static Individual[] crossover(Individual i1, Individual i2, Random random, double p_c) {
+        double r = random.nextDouble();
+        Individual [] individuals = new Individual[2];
+        if (r < p_c) {
+            //Crossover occurs
+            //Pick the point as 0 or 1.
+            int cross_pt = random.nextInt(2);
+            if (cross_pt == 0) {
+                //Swap the head
+                double temp0 = i1.getGene(0);
+                i1.setGene(i2.getGene(0), 0);
+                i2.setGene(temp0, 0);
+            }
+            if (cross_pt == 1) {
+                //Swap the tail
+                double temp2 = i1.getGene(2);
+                i1.setGene(i2.getGene(2), 2);
+                i2.setGene(temp2, 2);
+            }
+        }
+        //Pack it up and send it home.
+        individuals[0] = i1;
+        individuals[1] = i2;
+        return individuals;
     }
 }
