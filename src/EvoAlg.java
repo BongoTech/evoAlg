@@ -30,6 +30,8 @@ public class EvoAlg {
         long seed = 835149854;
         //Change to alter the probability of crossover
         double p_c = 0.8;
+        //Change this to alter mutation rate
+        double p_m = 0.1;
 
         Random r = new Random(seed);
 
@@ -42,9 +44,10 @@ public class EvoAlg {
         //Sample the initial population
         sample(pop);
 
+        //Testing the mutation and crossover and selection methods.
         Individual [] individuals;
-        individuals = crossover(select(pop, r), select(pop, r), r, p_c);
-        System.out.println("ID AFTER CROSSOVER!");
+        individuals = mutate(crossover(select(pop, r), select(pop, r), r, p_c), r, p_m, domain[0], domain[1]);
+        System.out.println("ID AFTER CROSSOVER AND MUTATION!");
         for (int i = 0; i < 2; i++ ) {
             individuals[i].print();
         }
@@ -162,5 +165,30 @@ public class EvoAlg {
         individuals[0] = i1;
         individuals[1] = i2;
         return individuals;
+    }
+
+    //mutate takes two individuals at a time. It is designed to have the output of crossover
+    //be its input. It also takes in the random. If it made it's own random then there wouldn't be
+    //reproducible results. It takes in the probability of mutation and the bounds for the genes.
+    //If a mutate is triggered, mutate will replace the gene with a random value over the domain.
+    //It returns the same number of Individuals that it takes in.
+    private static Individual[] mutate(Individual[] individuals, Random random, double p_m, double gene_lower_bound, double gene_upper_bound) {
+        double r;
+        //Loop through the individuals
+        for (int i = 0; i < individuals.length; i++) {
+            //Loop through an individual's genes
+            for (int j = 0; j < individuals[i].getGenome_size(); j++) {
+                r = random.nextDouble();
+                if (r < p_m) {
+                    //Mutation occurs
+                    double gene_value = gene_lower_bound + (gene_upper_bound - gene_lower_bound) * random.nextDouble();
+                    //Assign a random value from domain to gene.
+                    individuals[i].setGene(gene_value, j);
+                }
+            }
+        }
+        //Pack it up and send it home.
+        Individual[] ind = {individuals[0], individuals[1]};
+        return ind;
     }
 }
