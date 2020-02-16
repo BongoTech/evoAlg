@@ -29,15 +29,18 @@ public class EvoAlg {
         double [] domain = {-1, 5};
         //Change this seed each time you'd like to produce a different
         //run. Record this seed for reproducibility of results.
-        long seed = 835149854;
+        long seed = 123432342;
         //Change to alter the probability of crossover
         double p_c = 0.8;
         //Change this to alter mutation rate
         double p_m = 0.1;
         //The number of generations
-        int generations = 50;
+        int generations = 51;
         //The Random used by the entire program.
         Random r = new Random(seed);
+        //Used to keep track of the best of run solution
+        //across all generations.
+        Individual bor = new Individual(genome_size);
 
         //***MAIN EVOLUTIONARY ALGORITHM******************************************************************
         int t = 0;
@@ -64,28 +67,46 @@ public class EvoAlg {
                 Individual [] individuals;
                 individuals = mutate(crossover(select(pop_clone, r), select(pop_clone, r), r, p_c), r, p_m, domain[0], domain[1]);
                 //Add the first individual to the first half of the population.
-                next_pop.setIndividual(individuals[0], i);
+                next_pop.setIndividual(new Individual(individuals[0]), i);
                 //Add the second individual to the second half of the population.
-                next_pop.setIndividual(individuals[1], (pop_size/2)+i);
+                next_pop.setIndividual(new Individual(individuals[1]), (pop_size/2)+i);
             }
             //The new population is complete, assign it as the previous generation
             //to move to the new gen.
-            pop = next_pop;
+            pop = new Population(next_pop);
             //Evaluate the new generation.
             eval(pop);
             //Sample the new generation.
             //F is total pop fitness.
             double F = sample(pop);
+            //Get the fittest individual from the generation.
+            Individual gen_fittest = new Individual(getFittest(pop));
+            //Get the weakest individual from the generation.
+            Individual gen_weakest = new Individual(getWeakest(pop));
+            //Compare it to the best of run.
+            if (bor.getFitness() < gen_fittest.getFitness()) {
+                bor = new Individual(gen_fittest);
+            }
             //At intervals of 10, print the total gen fitness.
             if (t % 10 == 0) {
-                System.out.println("Total fitness for gen " + t + ": " + F);
+                System.out.println("GENERATION " + t);
+                System.out.println("Total fitness: " + F);
+                System.out.println("Fittest Individual: ");
+                gen_fittest.print();
+                System.out.println("Weakest Individual: ");
+                gen_weakest.print();
+                System.out.println("Average Fittnes: " + F/pop_size);
+                System.out.println();
             }
             //Increment the generation number.
             t += 1;
         }
         //When everything is done print the resulting solution.
-        pop.print();
-
+        //pop.print();
+        //double bor = getFittest(pop);
+        //System.out.println("The BOR is: " + bor);
+        System.out.println();
+        bor.print();
     }
 
     //The eval function assigns a fitness value to each individual in the
@@ -227,5 +248,29 @@ public class EvoAlg {
         //Pack it up and send it home.
         Individual[] ind = {individuals[0], individuals[1]};
         return ind;
+    }
+
+    public static Individual getFittest(Population population) {
+        double max = -1;
+        Individual individual = new Individual(population.getIndividual(0).getGenome_size());
+        for (int i = 0; i < population.getPop_size(); i++) {
+            if (max < population.getIndividual(i).getFitness()) {
+                max = population.getIndividual(i).getFitness();
+                individual = new Individual(population.getIndividual(i));
+            }
+        }
+        return individual;
+    }
+
+    public static Individual getWeakest(Population population) {
+        double min = 100;
+        Individual individual = new Individual(population.getIndividual(0).getGenome_size());
+        for (int i = 0; i < population.getPop_size(); i++) {
+            if (min > population.getIndividual(i).getFitness()) {
+                min = population.getIndividual(i).getFitness();
+                individual = new Individual(population.getIndividual(i));
+            }
+        }
+        return individual;
     }
 }
